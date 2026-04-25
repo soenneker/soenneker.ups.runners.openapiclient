@@ -71,7 +71,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
         string sourceDirectory = await _gitUtil.CloneToTempDirectory(openApiGitUrl, cancellationToken: cancellationToken);
         string jsonDirectory = await ConvertAllOpenApiFilesToJson(sourceDirectory, cancellationToken);
 
-        var merged = await _openApiMerger.MergeDirectory(jsonDirectory, cancellationToken);
+        OpenApiDocument merged = await _openApiMerger.MergeDirectory(jsonDirectory, cancellationToken);
 
         string json = _openApiMerger.ToJson(merged);
 
@@ -114,11 +114,11 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
             if (!string.IsNullOrWhiteSpace(targetJsonDirectory))
                 await _directoryUtil.Create(targetJsonDirectory, false, cancellationToken);
 
-            var yaml = await _fileUtil.Read(filePath, true, cancellationToken);
+            string yaml = await _fileUtil.Read(filePath, true, cancellationToken);
 
-            var normalized = _yamlUtil.Normalize(yaml);
+            string normalized = _yamlUtil.Normalize(yaml);
 
-            var json = _yamlUtil.YamlToJson(normalized);
+            string? json = _yamlUtil.YamlToJson(normalized);
 
             await _fileUtil.Write(targetJsonPath, json, true, cancellationToken);
         }
