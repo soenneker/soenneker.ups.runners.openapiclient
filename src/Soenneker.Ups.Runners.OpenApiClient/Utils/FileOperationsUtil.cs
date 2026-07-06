@@ -181,6 +181,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
         {
             // Delete all files except .csproj
             List<string> files = await _directoryUtil.GetFilesByExtension(directoryPath, "", true, cancellationToken);
+
             foreach (string file in files)
             {
                 if (!file.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
@@ -199,6 +200,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
 
             // Delete all empty subdirectories
             List<string> dirs = await _directoryUtil.GetAllDirectoriesRecursively(directoryPath, cancellationToken);
+
             foreach (string dir in dirs.OrderByDescending(d => d.Length)) // Sort by depth to delete from deepest first
             {
                 try
