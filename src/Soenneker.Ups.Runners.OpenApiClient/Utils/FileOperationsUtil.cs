@@ -17,6 +17,7 @@ using Soenneker.Extensions.ValueTask;
 using Soenneker.Kiota.Util.Abstract;
 using Soenneker.Utils.Directory.Abstract;
 using Soenneker.Utils.File.Abstract;
+using Soenneker.Utils.Path.Abstract;
 using Soenneker.OpenApi.Fixer.Abstract;
 using Soenneker.OpenApi.Merger.Abstract;
 using System.Collections.Generic;
@@ -35,12 +36,13 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
     private readonly IKiotaUtil _kiotaUtil;
     private readonly IFileUtil _fileUtil;
     private readonly IDirectoryUtil _directoryUtil;
+    private readonly IPathUtil _pathUtil;
     private readonly IOpenApiMerger _openApiMerger;
     private readonly IOpenApiFixer _openApiFixer;
     private readonly IYamlUtil _yamlUtil;
 
     public FileOperationsUtil(ILogger<FileOperationsUtil> logger, IConfiguration configuration, IGitUtil gitUtil, IDotnetUtil dotnetUtil,
-        IProcessUtil processUtil, IFileUtil fileUtil, IDirectoryUtil directoryUtil, IOpenApiMerger openApiMerger,
+        IProcessUtil processUtil, IFileUtil fileUtil, IDirectoryUtil directoryUtil, IPathUtil pathUtil, IOpenApiMerger openApiMerger,
         IYamlUtil yamlUtil, IKiotaUtil kiotaUtil, IOpenApiFixer openApiFixer)
     {
         _logger = logger;
@@ -51,6 +53,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
         _kiotaUtil = kiotaUtil;
         _fileUtil = fileUtil;
         _directoryUtil = directoryUtil;
+        _pathUtil = pathUtil;
         _openApiMerger = openApiMerger;
         _openApiFixer = openApiFixer;
         _yamlUtil = yamlUtil;
@@ -94,13 +97,10 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
 
     private async ValueTask<string> ConvertAllOpenApiFilesToJson(string sourceDirectory, CancellationToken cancellationToken)
     {
-        string jsonDirectory = Path.Combine(Path.GetTempPath(), $"ups-openapi-json-{Guid.NewGuid():N}");
+        string jsonDirectory = await _pathUtil.GetUniqueTempDirectory("ups-openapi-json", cancellationToken: cancellationToken).NoSync();
 
-        await _directoryUtil.Create(jsonDirectory, false, cancellationToken);
-
-        string[] filePaths = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories)
-                                      .Where(IsSupportedOpenApiFile)
-                                      .ToArray();
+        string[] allFiles = await _fileUtil.GetAllFileNamesInDirectoryRecursively(sourceDirectory, log: false, cancellationToken).NoSync();
+        string[] filePaths = allFiles.Where(IsSupportedOpenApiFile).ToArray();
 
         foreach (string filePath in filePaths)
         {

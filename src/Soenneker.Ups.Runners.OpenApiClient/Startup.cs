@@ -6,6 +6,9 @@ using Soenneker.OpenApi.Merger.Registrars;
 using Soenneker.Ups.Runners.OpenApiClient.Utils;
 using Soenneker.Ups.Runners.OpenApiClient.Utils.Abstract;
 using Soenneker.Utils.Yaml.Registrars;
+using Soenneker.Utils.Directory.Registrars;
+using Soenneker.Utils.File.Registrars;
+using Soenneker.Utils.Path.Registrars;
 
 namespace Soenneker.Ups.Runners.OpenApiClient;
 
@@ -34,6 +37,9 @@ public static class Startup
         services.AddHostedService<ConsoleHostedService>()
                 .AddSingleton<IFileOperationsUtil, FileOperationsUtil>()
                 .AddRunnersManagerAsSingleton()
+                .AddDirectoryUtilAsSingleton()
+                .AddFileUtilAsSingleton()
+                .AddPathUtilAsSingleton()
                 .AddOpenApiMergerAsSingleton()
                 .AddOpenApiFixerAsSingleton()
                 .AddYamlUtilAsSingleton()
