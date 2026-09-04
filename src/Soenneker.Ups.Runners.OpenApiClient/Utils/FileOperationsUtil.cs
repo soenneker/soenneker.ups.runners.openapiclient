@@ -26,6 +26,7 @@ using Soenneker.Utils.Yaml.Abstract;
 
 namespace Soenneker.Ups.Runners.OpenApiClient.Utils;
 
+/// <inheritdoc cref="IFileOperationsUtil" />
 public sealed class FileOperationsUtil : IFileOperationsUtil
 {
     private readonly ILogger<FileOperationsUtil> _logger;
