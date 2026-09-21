@@ -124,6 +124,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
                 throw new InvalidOperationException($"Failed to convert OpenAPI document to JSON: {filePath}");
 
             await _fileUtil.Write(targetJsonPath, json, true, cancellationToken);
+            await _openApiFixer.Fix(targetJsonPath, targetJsonPath, cancellationToken).NoSync();
         }
 
         return jsonDirectory;
